@@ -1,0 +1,407 @@
+body {
+  margin: 0 0 0 0;
+  background: #FFFFFF url(http://wanderingstan.com/wp-content/themes/minimalism/images/background.png) repeat-y scroll 0 0
+}
+
+
+/* Whole Container */
+#container {
+  width: 900px; /* 750px; */
+  margin: 0 auto;
+  font-family: "Lucida Grande", Helvetica, Arial, Verdana, sans-serif; /* Lucida Grande for the Macs, Tahoma for the PCs */
+  font-size: 11px;
+  /*line-height: 1.6em;*/
+  color: #333333;
+  background-color: #FFF;
+}
+
+/* GENERAL */
+h2 {
+  color: #333333;
+  font-size: 13px;
+  font-family: "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+  background-color: #FFF;
+  text-transform: capitalize;
+}
+a {
+  color:#BB3300;
+  text-decoration: none;
+}
+a:hover {
+  color:#BB3300;
+  background-color: #D88A6D;
+}
+input, .search-form input {
+  background-color: #FFF;
+  color: #999999;
+  border: 1px solid #CCC;
+  font-size: 11px;
+  padding: 2px;
+  margin: 2px 0px 2px 0px;
+}
+#search .form-submit {
+  padding: 1px 2px 1px 2px;
+  margin: 2px 0px 2px 0px;
+}
+		
+/* HEADER ELEMENTS */
+#header {
+  /* background-color: #BB3300;  
+  border-bottom: 4px solid #BB3300; */
+  /* margin: 10px 0 10px 0; */
+  margin:0 0 15px;
+  padding-top: 10px;
+}
+#header h1 {
+  font-size: 22px;
+  color: #BB3300;
+  margin: 0 0 0 0;
+  padding: 10px 0 10px 10px;
+ font-family:georgia,times,serif;
+ font-size:4em;
+ font-style:italic;
+ letter-spacing:-0.05em;  
+ line-height: 0.5em;
+}
+
+#navlist {
+padding: 6px;
+}
+
+#header h1 a {
+  color: #BB3300;  
+}
+#header h1 a:hover {
+  color: #BB3300;
+  background-color: white;  
+}
+
+#header ul.links {
+  font-size:13px;
+  font-weight: bold;
+  display: inline;
+background-color: #BB3300;  
+  
+}
+
+#header ul.links a {
+  color: #fff;
+}
+
+#header a:hover {
+  color: #fff;
+  background-color: #D88A6D;
+}
+
+/* the slogan */
+#header .slogan { 
+  margin:6px 0 10px 8px;
+  color: #BB3300;
+}
+#search {
+  float:right;
+  margin: -45px 0px 0px 0px;
+  font-size: 9px;
+}
+/* sidebar-left ELEMENTS */
+#sidebar-left {
+  margin-left: 0;
+  padding-left: 0;
+  float: left;
+  width: 210px; /* 160px; */
+}
+#sidebar-left ul {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+  list-style-type: none;			
+  width: 190px /* 140px; */
+}
+#sidebar-left li li a {
+  margin: 0px 0px 0px 15px;
+  width: 175px /* 125px; */
+}
+#sidebar-left li li li a {
+  margin: 0px 0px 0px 30px;
+  width: 160px; /* 110px; */
+}
+#sidebar-left a {
+  display: block;
+  margin: 0px 0px 0px 0px;
+  padding: 5px;
+  width: 190px; /*140px;*/
+  text-transform: capitalize;
+}
+.navlist a:visited {
+  color:#BB3300;
+  text-decoration: none;
+}
+#sidebar-left a:link {
+  color:#BB3300;
+  text-decoration: none;
+}
+#sidebar-left a:hover {
+  /* background: #000000 url(images/arrow.gif) 96% 50% no-repeat; */
+  background-color: #F2E4DE;
+  /* color:#BB3300; */
+}
+/* THE SMALL BOX BELOW NAV */
+#sidebar-left p {
+  padding: 5px;
+  border-bottom: 1px dotted #CCC;
+  border-top: 1px dotted #CCC;
+}
+		
+/* CONTENT ELEMENTS */
+/* admin content layout */
+#content.admin {
+  width: 570px;
+}
+#content {
+	width: 462px; /*362px; */
+	float: left;
+	margin: 0px 0px 0px 20px;
+	overflow: hidden;
+}
+.breadcrumb {
+  text-align: left;
+	color: #999999;
+  padding: 0px 0px 0px 0px;
+}
+.breadcrumb a:link, .breadcrumb a:visited {
+	color: #999999;
+	text-decoration: none;
+}
+.breadcrumb a:hover {
+	color: #aaaaaa;
+	text-decoration: none;
+}
+h1.title {
+	margin: 5px 0px 5px 0px;
+}
+#mission {
+  padding: 6px 12px 6px 12px;
+  background-color: #f9f9f9;
+  color: #607080;
+}
+#content h2 a:link, #content h2 a:visited {
+  color: #666666;
+}
+#content h2 a:hover {
+  color: #BB3300;
+}
+#content p {
+  padding-bottom: 10px;
+}
+#content .node {
+  /*border-bottom: 1px solid #DDDDDD;*/ /* A faint grey line below the text */
+}
+
+div.dashboard-container1 {
+	overflow: hidden;
+}
+div.dashboard-container2 {
+	overflow: hidden;
+}
+div.dashboard-panel-head {
+  background-color: #adadad;
+  color: #FFFFFF;
+  font-weight: bold;
+}
+#sidebar-left div.block {
+  border-bottom:1px solid #CCCCCC;
+}  
+
+#sidebar-left div.block h2.title {
+  border-top: 1px solid #D88A6D;
+  background-color: #F2E4DE;
+  margin: 0 0 0 0;
+  padding: 2px 0;
+}  
+
+/* SIDEBAR-right ELEMENTS */
+#sidebar-right {
+  float: right;
+  width: 175px;
+}
+#sidebar-right p {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+/* calendar ELEMENTS */
+#sidebar-left .calendar a, .calendar a  {
+	text-decoration: none;
+	display: inline;
+	margin: 0px 0px 0px 0px;
+	padding: 0px;
+	width: inherit;
+	border: none;
+	text-transform: none;
+}
+.calendar td, .calendar th {
+  padding: 0.4em 0;
+  border-color: #888;
+}
+.calendar .day-today {
+  background-color: #ccc;
+}
+.calendar .day-today a {
+  color: #fff;
+}
+.calendar .day-selected {
+  background-color: #ddd;
+  color: #fff;
+}
+.calendar .header-week {
+  background-color: #ccc;
+}
+.calendar .day-blank {
+  background-color: #ccc;
+}
+.calendar .row-week td a:hover {
+  background-color: #fff; color: #000;
+}
+
+/* FOOTER ELEMENTS */
+#footer {
+  margin-top: 20px;
+  clear: both;
+  background-color:#BB3300;
+  padding: 0px 5px 0px 5px;
+}
+#footer p {
+  color:#89817f;
+  padding: 5px;
+}
+#footer p a {
+  color: #89817f;
+  border-bottom: 1px dotted #89817f;
+}
+#footer p a:hover {
+  color: #FFFFFF;
+  background-color:#575352;
+}
+
+
+.event-nodeapi div {
+  padding: 0 0 0 0l
+}
+
+
+/*
+**
+**
+SimStan
+**
+**
+***/
+.sidebar {
+  line-height: 100%;
+}
+#edit-comment {
+  height: 5em;
+}
+$edit-body {
+  height: 10em;
+}
+/* Hide subscriptions settings ... we'll leave people subscribed by default */
+#edit-notify-wrapper {
+  background-color: red;
+  display: none;
+}
+#edit-notify-type-1-wrapper {
+  background-color: red;
+  display: none;
+}
+#edit-notify-type-2-wrapper {
+  display: none;
+  background-color: red;
+}
+
+/* Move profile pic to left side */
+div.picture {
+  float: left !important;
+  margin: 6px;
+  min-height: 50px;
+}
+
+div.picture a img {
+  max-width: 50px;
+  max-height: 50px;
+}
+
+#comments .comment div.picture {
+  min-height: 32px; 
+}
+#comments .comment div.picture a img {
+  max-width: 32px;
+  max-height: 32px;
+}
+
+/*
+#edit-name-wrapper {
+  display: none;
+}
+*/
+
+/* hide profile picture on profile page */
+.profile .picture {
+  display: none;
+}
+
+.comments .new {
+  float: right;
+}
+
+/*
+#block-event-1 .item-list ul li a {
+  margin-top:0px;
+}
+span.event-timeleft {
+  padding-bottom: 0px;
+}
+*/
+
+#sidebar-left a {
+  padding: 0px;
+  display: inline;
+}
+
+div.comment {
+  border: 1px solid #575352;
+  margin-bottom: 6px;
+-moz-border-radius-bottomleft:6px;
+-moz-border-radius-bottomright:6px;
+-moz-border-radius-topleft:6px;
+-moz-border-radius-topright:6px;  
+-webkit-border-radius: 6px;
+  
+}
+/* hide stupid comment titles */
+div.comment h3 {
+  display: none;
+}
+.submitted {
+  color: gray;
+}
+.simstan-current-user-div {
+  float: right;
+  border: 1px solid #BB3300;
+  min-height: 32px;
+  padding: 4px;
+-moz-border-radius-bottomleft:6px;
+-moz-border-radius-bottomright:6px;
+-moz-border-radius-topleft:6px;
+-moz-border-radius-topright:6px;  
+-webkit-border-radius: 6px;
+
+}
+.simstan-current-user-div img {
+  width: 32px;
+  margin-right: 4px;
+}
+
+/* hide facebook feed option for comments */
+#edit-fbconnect-feed-wrapper {
+  display: none;
+}

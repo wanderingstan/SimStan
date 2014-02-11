@@ -1,0 +1,9 @@
+/* prevent the page from scrolling */
+body {
+   overflow: hidden;
+}
+
+/* This moves the calendar right edge snug against the right edge of browser window */
+.clear-block {
+  margin-right: -20px;
+}

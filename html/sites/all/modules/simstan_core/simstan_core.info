@@ -1,0 +1,4 @@
+name = SimStan Core
+description = Core functionality for SimStan. Rock and Roll!
+package = "SimStan"
+core = 6.x

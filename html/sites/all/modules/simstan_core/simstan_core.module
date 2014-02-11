@@ -1,0 +1,371 @@
+<?php
+// $Id:  $
+/*
+ * Copyright (c) 2009 Stan James
+ * http://wanderingstan.com/
+ * stan@wanderingstan.com
+ *
+ * Dual licensed under the MIT and GPL licenses:
+ *   http://www.opensource.org/licenses/mit-license.php
+ *   http://www.gnu.org/licenses/gpl.html
+
+*/
+
+function simstan_core_help($section) {
+  if ($section == 'admin/modules#description') {
+    return t('Allow others to control Stan\'s life.');
+  }
+}
+
+/**
+ * Implementation of hook_init()
+ */
+function simstan_core_init() {
+    
+  // This ugly little hack will bypass the FBconnect page which asks if you want to 
+  // create a new account or 'connect' with an existing account. We have no existing accounts,
+  // so the question is pointless to ask. 
+  // We put the logic here we don't touch the code of the FB connect module.'
+  //if ( (arg(0)=='admin') && (arg(1)=='settings') && (arg(2)=='fbconnect')) { // TESTING
+  if ( (arg(0)=='fbconnect') && (arg(1)=='register') && (arg(2)=='prompt')) {
+    // Option 1: Redirect with Javascript
+    //drupal_add_js('alert("Hello' . arg(0) . arg(1) . '");', 'inline', 'header');
+    
+    // Option 2: Redirect with HTTP header
+    header('Location: /fbconnect/register/create') ;
+  }
+  
+  // Ugly hack to skip the ugly default "event" page.
+  if ( (arg(0)=='event') && (!arg(1))) {    
+    // Redirect with HTTP header
+    header('Location: /eventweek/week') ;
+  }
+
+  if ( (arg(0)=='event') && (arg(3)) && (!arg(4)) ) {    
+    // Redirect with HTTP header
+    header('Location: /eventweek/' . arg(1). '/' . arg(2) . '/'. arg(3) . '/week') ;
+  }
+
+//  if ( (arg(0)=='user') && (arg(1)=='register')) {
+// $("#edit-name")[0].disabled="disabled";
+  
+  if ( (arg(0)=='fbconnect') && (arg(1)=='register') && (arg(2)=='create')) {
+    drupal_add_js(' $("#edit-name-wrapper")[0].style.display="none";  $("#edit-mail")[0].focus();', 'inline', 'footer');
+  }
+}
+
+function simstan_core_menu() {
+  // Display page for one week. (Primary Page)
+  $items['simstan_core'] = array(
+    'title' => 'Week of Events',
+    'page callback' => 'simstan_core_page',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+  
+}
+
+function simstan_core_page() {
+  //global $user;
+  //print_r ($user);
+  $fbuid = $_GET['fbuid'];
+  simstan_core_test_fb_friendship($fbuid);
+  return "Just checked facebook friends.";
+}
+
+/** 
+ * Get facebook friend who has_added_app.
+ * parameter: Facebook userid of current user
+ */
+function simstan_core_test_fb_friendship($fbuid) {
+  $STAN_FBUID = '252800001';
+  
+  if (facebook_client()) {
+    
+    if ($fbuid==$STAN_FBUID) {
+      // Of course stan is a friend of himself (even if FB doesn't think so!)
+    	return true;
+    }
+    
+    $query = 'SELECT uid2 FROM friend WHERE uid1=' . $STAN_FBUID . ' and uid2=' . $fbuid;
+    try {
+      $rows = facebook_client()->api_client->fql_query($query);
+    }
+    catch (Exception $e) {
+      watchdog('fbconnect', 'Exception thrown while using fbconnect_get_connected_friends: @code', array('@code' => $e->getMessage()), WATCHDOG_WARNING);
+    }
+
+    if ($rows) {
+      foreach ($rows as $row) {
+        if ($row['uid2']) {
+          // IS a friend
+          return true;
+        }
+      }      
+    }
+    else {
+      // Not a friend
+    }
+    
+  }
+  else {
+      drupal_set_message ("There is no Facebook client. Cannot test for friendship.");
+  }
+  return false;
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function simstan_core_user($op, &$edit, &$account, $category = NULL) {
+/*
+$user =
+  stdClass Object
+  (
+      [uid] => 1
+      [name] => admin
+      [pass] => 5f4dcc3b5aa765d61d8327deb882cf99
+      [mail] => stan@wanderingstan.com
+      ...
+      [roles] => Array
+          (
+              [2] => authenticated user
+              [3] => admin
+          )
+  )
+*/
+  $FRIEND_ROLE_ID = 4;
+  $FRIEND_ROLE_NAME = 'friend';
+  
+  if ($op=='login') {
+    if (!$account->uid) {
+    	die ("No user ID passed to simstan_core_user.");
+    }
+    $fbuid  = fbconnect_get_fbuid();
+    if ($fbuid) {
+      // copy existing roles into our "to-be-updated" array
+      $array = array();
+      $array['roles'] = $account->roles;
+      // filter out friend role, if already existing
+      unset($array['roles'][$FRIEND_ROLE_ID]); // '4' is our 'friend' role.
+      if (simstan_core_test_fb_friendship($fbuid)) {
+        // Add 'Friend' role
+        $array['roles'][$FRIEND_ROLE_ID] = $FRIEND_ROLE_NAME;
+        drupal_set_message (t('Welcome, friend of Stan.'));
+      }
+      else {
+      	// Remove 'Friend' role
+        drupal_set_message (t('Welcome, Facebook guest. Because you are not freind of Stan, you may not edit his calendar. But feel free to observe and comment!'));          
+      }
+      // Save our changes
+      user_save($account, $array);
+    }    
+  }
+  elseif ($op=='view') {
+    $fbuid = db_result(db_query('SELECT fbuid FROM {fbconnect_users} WHERE uid=%d', $account->uid));
+    if ($fbuid) { 
+      $fbml = '<fb:profile-pic uid="'.$fbuid.'" linked="true" ></fb:profile-pic>&nbsp;<font size="+1"><fb:name uid="'.$fbuid.'"></fb:name></font> <font color="gray"><fb:user-status uid="'.$fbuid.'" linked="true"></fb:user-status></font>';
+      if (!isset($account->content['facebook'])) {
+        $account->content['facebook'] = array();
+      }
+      $account->content['facebook'] += array(
+        '#type' => 'user_profile_category',
+        '#attributes' => array('class' => 'user-member'),
+        '#weight' => -6,
+        '#title' => t('On Facebook'),
+      );
+      $account->content['facebook']['link'] =  array(
+        '#type' => 'user_profile_item',
+        '#value' => $fbml, // l(t('Facebook Profile'), 'http://www.facebook.com/profile.php?id=' . $fbuid) . 
+      );
+    }
+    else {
+      // not on facebook
+    }
+    
+    // Show list of contributions
+    if (in_array('friend', array_values($account->roles))) {
+      $friend_status = $account->name . " is a friend of Stan.";
+    }    
+    else {
+      $friend_status = $account->name . " is not a friend of Stan, so cannot make contributions to the calendar.";
+    }
+    
+    $sql = "
+      SELECT * 
+      FROM 
+        `node` N
+      , `event` E
+      WHERE 
+      N.uid={$account->uid} 
+      AND N.type='event' 
+      AND N.status=1 
+      AND E.nid = N.nid
+      ORDER BY 
+      E.event_start DESC";
+    $result = db_query($sql);
+    while($row = db_fetch_object($result)) {
+      //$event_node = node_load($row->nid);
+      //print_r($event_node);
+      $contrib .= "<li>" . substr($row->event_start,5,11) . " to " . substr($row->event_end,11,5) . " <a href='/node/" . $row->nid . "'><b>" . $row->title . "</b></a>" . ((strtotime($row->event_start) < time()) ? "" : " (Not yet occured.)") . "</li>";
+      
+    }
+    
+    $account->content['simstan'] = array();
+    $account->content['simstan'] += array(
+      '#type' => 'user_profile_category',
+      '#attributes' => array('class' => 'user-member'),
+      '#weight' => -5,
+      '#title' => t('SimStan Contributions'),
+    );
+    $account->content['simstan']['link'] =  array(
+      '#type' => 'user_profile_item',
+      '#value' => $friend_status . "<ul>" . $contrib . "</ul>",
+    );
+    
+  }
+}
+
+/**
+ * Perform daily events
+ */
+function simstan_core_cron() {
+  // switch to admin user
+  global $user;
+  $current_user = $user;
+  session_save_session(FALSE);
+  $user = user_load(array('uid' => 1));
+  
+  
+  // Mark all events of next day (and earlier) as being Locked
+  $sql = "REPLACE INTO 
+            term_node
+          SELECT
+            N.nid
+          , N.vid
+          , 1 /* Term ID for 'locked' or whatever */
+          FROM 
+            node N
+          , event E
+          WHERE
+              N.nid = E.nid
+          AND N.type = 'event'    
+          AND UNIX_TIMESTAMP(E.event_start) < (UNIX_TIMESTAMP() + (60*60*24)) 
+  ";
+  db_query( $sql);
+  
+  variable_set("simstan_core_calendar_locked_until", time()+(60*60*24));
+  
+  drupal_mail("simstan_core", "stans_day", "stan@wanderingstan.com", "en");  
+  print "Maybe sent mail?";
+  
+  $user = $current_user;
+  session_save_session(TRUE);
+}
+
+function simstan_core_mail($key, &$message, $params) {
+  $language = $message['language'];
+  $variables = user_mail_tokens($params['account'], $language);
+  switch($key) {
+	  case 'stans_day': 
+      $message['subject'] = t('Notification from !site', $variables, $language->language);
+      // TODO: do this better
+      //$contents = file_get_contents('http://simstan/event/2009/7/17/day');
+      global $base_url; 
+      $rewrite_parameter = array();        
+      $date =  _event_user_date();
+      $cur_date = event_date_later($date, 0, 'days');
+      $out = 'Events for ' . event_implode_date($cur_date) . "\n";
+      event_calendar_data($cur_date, 'day', NULL, NULL, 'prepopulate', array(), $rewrite_parameter);
+      $nodes = event_calendar_data($cur_date, 'day', NULL, NULL, 'lookup', array(), $rewrite_parameter);
+      $cur_date = event_date_later($date, 1, 'days');
+      event_calendar_data($cur_date, 'day', NULL, NULL, 'prepopulate', array(), $rewrite_parameter);
+      $nodes2 = event_calendar_data($cur_date, 'day', NULL, NULL, 'lookup', array(), $rewrite_parameter);
+      $nodes = array_merge($nodes, $nodes2);
+      foreach ($nodes as $node) {
+        $mins = floor(event_duration($node->event['start_exploded'], $node->event['end_exploded'], 'seconds') / 60);
+        $out .= "\n\n" . str_repeat('-', floor($mins/2)). "\n";
+        $out .= $node->event['start'] . " to\n" . $node->event['end'] . " (" . $mins . " mins)\n\n";
+        $out .= "Title: " . $node->title . "\n\n";
+        $out .= $node->body . "\n";
+        $out .= "Link: " . $base_url . "/node/" . $node->nid . "\n";        
+      }            
+      print $out;    
+      $message['body'][] = $out;
+    break;
+    case 'event_modified': 
+    
+      $message['subject'] = t('Your event on !site has been changed.', $variables, $language->language);
+      $message['body'][] = $out;    
+  } 
+}														
+
+function simstan_core_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if (($op == 'update') && ($node->type == 'event')) {
+    global $base_url;
+    global $user;
+    $owner_user = user_load($node->uid);
+    $body .= $node->name . ",\n\n" . $user->name . " modifified a SimStan event that you created.\n\n";
+    if ($node->log) {
+    	$body .= $node->log . "\n\n";
+    }
+    $body .= "Here are the new event details:\n\n";
+    $body .= event_implode_date($node->event['start_exploded']) . " to\n" . event_implode_date($node->event['end_exploded']) . "\n\n";
+    $body .= "Title: " . $node->title . "\n\n";
+    $body .= $node->body . "\n\n";
+//    $body .= "View this event: " . $base_url . "/node/" . $node->nid . "\n";        
+    $body .= "Edit this event: " . $base_url . "/node/" . $node->nid . "/edit\n";   
+    $body .= $user->name . " Profile: " . $base_url . "/user/" . $user->uid . "\n";   
+
+    //print_r($node);     
+    
+    //drupal_mail("simstan_core", "event_modified", 'stan@lijit.com', "en");// $owner_user->mail
+    $to = $owner_user->mail;
+    $from = variable_get('site_mail', 'stan@wanderingstan.com');
+    $subject = "Your SimStan event was modified by " . $user->name;
+    $headers = "From: " . $from . "\r\n" . 
+               "X-Mailer: php";
+    $success =  (mail($to, $subject, $body, $headers));
+
+/*
+    if ($success) {               
+      echo("<p>Message sent!</p>");
+    } 
+    else {
+      echo("<p>Message delivery failed...</p>");
+    }
+*/
+  }
+  else if (($op == 'insert') && ($node->type == 'event')) {
+    global $base_url;
+    global $user;
+    $owner_user = user_load($node->uid);
+    $body .= $node->name . ",\n\n" . $user->name . " created a SimStan event.\n\n";
+    if ($node->log) {
+      $body .= $node->log . "\n\n";
+    }
+    $body .= "Here are the new event details:\n\n";
+    $body .= event_implode_date($node->event['start_exploded']) . " to\n" . event_implode_date($node->event['end_exploded']) . "\n\n";
+    $body .= "Title: " . $node->title . "\n\n";
+    $body .= $node->body . "\n\n";
+//    $body .= "View this event: " . $base_url . "/node/" . $node->nid . "\n";        
+    $body .= "Edit this event: " . $base_url . "/node/" . $node->nid . "/edit\n";   
+    $body .= $user->name . " Profile: " . $base_url . "/user/" . $user->uid . "\n";   
+
+    //print_r($node);     
+    
+    //drupal_mail("simstan_core", "event_modified", 'stan@lijit.com', "en");// $owner_user->mail
+    $to = 'stan@wanderingstan.com';
+    $from = variable_get('site_mail', 'stan@wanderingstan.com');
+    $subject = "A SimStan event was created by " . $user->name;
+    $headers = "From: " . $from . "\r\n" . 
+               "X-Mailer: php";
+    $success =  (mail($to, $subject, $body, $headers));
+    
+  }
+  
+  return;
+}
+  
+?>

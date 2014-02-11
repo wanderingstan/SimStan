@@ -1,0 +1,599 @@
+<?php
+// $Id:  $
+
+/*
+ * Copyright (c) 2009 Stan James
+ * http://wanderingstan.com/
+ * stan@wanderingstan.com
+ *
+ * Dual licensed under the MIT and GPL licenses:
+ *   http://www.opensource.org/licenses/mit-license.php
+ *   http://www.gnu.org/licenses/gpl.html
+
+*/
+
+function eventweek_help($section) {
+  if ($section == 'admin/modules#description')
+    return t('A week display similar to Google Calendar, using jQuery Week Calendar.');
+}
+
+
+/**
+ * Implementation of hook_menu().
+ *
+ * You must implement hook_menu() to emit items to place in the main menu.
+ * This is a required step for modules wishing to display their own pages,
+ * because the process of creating the links also tells Drupal what
+ * callback function to use for a given URL. The menu items returned
+ * here provide this information to the menu system.
+ *
+ * With the below menu definitions, URLs will be interpreted as follows:
+ *
+ * If the user accesses http://example.com/?q=foo, then the menu system
+ * will first look for a menu item with that path. In this case it will
+ * find a match, and execute scanner_foo().
+ *
+ * If the user accesses http://example.com/?q=bar, no match will be found,
+ * and a 404 page will be displayed.
+ *
+ * If the user accesses http://example.com/?q=bar/baz, the menu system
+ * will find a match and execute scanner_baz().
+ *
+ * If the user accesses http://example.com/?q=bar/baz/1/2, the menu system
+ * will first look for bar/baz/1/2. Not finding a match, it will look for
+ * bar/baz/1/%. Again not finding a match, it will look for bar/baz/%/2. Yet
+ * again not finding a match, it will look for bar/baz/%/%. This time it finds
+ * a match, and so will execute scanner_baz(1, 2). Note the parameters
+ * being passed; this is a very useful technique.
+ */
+function eventweek_menu() {
+
+  // By using the MENU_CALLBACK type, we can register the callback for this
+  // path but not have the item show up in the menu; the admin is not allowed
+  // to enable the item in the menu, either.
+
+  // Display page for one week. (Primary Page)
+  $items['eventweek/%/%/%/week'] = array(
+    'title' => 'Week of Events',
+    'page callback' => 'eventweek_display',
+    'page arguments' => array(1,2,3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  // Redirect to week containing *current* day
+  $items['eventweek/week'] = array(
+    'title' => 'Week of Events',
+    'page callback' => 'eventweek_today_display',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  // Get list of events for given week
+  $items['eventweek/json_api/fetch_events'] = array(
+    'page callback' => 'eventweek_fetch_events',
+    'page arguments' => array(3,4),
+    'access arguments' => array('access content'), // TODO: real security here
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['eventweek/json_api/create_event'] = array(
+    'page callback' => 'eventweek_create_event',
+    'access arguments' => array('access content'), // TODO: real security here
+    'type' => MENU_CALLBACK,
+  );
+  $items['eventweek/json_api/update_event/%'] = array(
+    'page callback' => 'eventweek_update_event',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'), // TODO: real security here
+    'type' => MENU_CALLBACK,
+  );
+  $items['eventweek/json_api/delete_event/%'] = array(
+    'page callback' => 'eventweek_delete_event',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'), // TODO: real security here
+    'type' => MENU_CALLBACK,
+  );
+      
+  return $items;
+}
+
+/**
+ * Redirect to week containing today
+ */
+function eventweek_today_display() {
+  $today = getdate();
+  header( 'Location: /eventweek/' . $today['year'] . '/' . $today['mon'] . '/' . $today['mday'] . '/week'); 
+  die;
+
+/*
+  drupal_add_css(drupal_get_path('module', 'eventweek') .'/css/noscroll.css');
+  drupal_add_js(drupal_get_path('module', 'eventweek') . '/js/resize_iframe.js','module','footer');
+  
+  $breadcrumbs[] = l(t('Home'), NULL);
+  $breadcrumbs[] = l(t('Weekly Calendar'), "eventweek/week");  
+  drupal_set_breadcrumb($breadcrumbs);
+  
+  $today = getdate();
+  $week_url = '/eventweek/' . $today['year'] . '/' . $today['mon'] . '/' . $today['mday'] . '/week';
+  $out = '';  
+  $out .= '<iframe id="eventweek-iframe" width="100%" height="600" frameborder="0"  src="' . $week_url . '"></iframe>';
+  return $out;
+*/
+}
+
+/**
+ * AJAX API call to delete an event
+ */
+function eventweek_delete_event($nid) {
+  // load the node
+  $nid = intval($nid);  
+  $node = node_load($nid);
+
+  // some checks
+  if (!$node) {
+    die ("Node with id $nid not found.");
+  }
+  if ($node->type != 'event') {
+    // not an event node...something's wrong
+    watchdog( 'warning', 'eventweek_delete_event called on a non-event node.', NULL, WATCHDOG_WARNING);
+    drupal_set_message('eventweek_delete_event called on a non-event node.','warning');
+    die('alert("Not an event node.");');
+  }
+  
+  // Insure has permission to edit node
+  // (Shouldn't drupal inforce this?)
+  if (!user_access('delete any event content')) {
+    global $user;
+    if (($user->uid == $node->uid) && (user_access('delete own event content'))) {
+      // user is deleting own event
+    }
+    else { 
+      die ('alert("User has no permission to delete other peoples events");');
+    }
+  }
+
+  
+  // status 0 = unpublished
+  $node->status = 0;
+  $node->log = "Event was deleted. (i.e. it was un-published)\n";
+  // save changes
+  node_save($node);
+    
+/*    
+  $nid = intval($nid);
+  node_delete($nid);
+*/
+  
+  echo "{'status':'success'}";
+  die;
+}
+
+/**
+ * AJAX API Call to update an event. 
+ * It accepts POST data, these fields recognized:
+ * start - in serialized javascript date format (ick!)
+ * end - in serialized javascript date format (ick!)
+ * title - Title of event given by user
+ * body - Body of event given by user
+ */
+function eventweek_update_event($nid) {
+  
+  // load the node
+  $nid = intval($nid);  
+  $node = node_load($nid);
+
+
+  // some checks
+  if (!$node) {
+    die ("Node with id $nid not found.");
+  }
+  if ($node->type != 'event') {
+    // not an event node...something's wrong
+    watchdog( 'warning', 'eventweek_update_event called on a non-event node.', NULL, WATCHDOG_WARNING);
+    drupal_set_message('eventweek_update_event called on a non-event node.','warning');
+    die('alert("Not an event node.");');
+  }
+  
+  // Insure has permission to edit node
+  // (Shouldn't drupal inforce this?)
+  if (!user_access('edit any event content')) {
+    global $user;
+    if (($user->uid == $node->uid) && (user_access('edit own event content'))) {
+      // user is editing own event
+    }
+    else { 
+      die ('alert("User has no permission to edit other peoples events");');
+    }
+  }
+    
+    
+  // get updated values from POST
+  $title = $_POST['title'];
+  $body = $_POST['body_raw'];
+  $start = _eventweek_javascript_datestring_to_php($_POST['start']);
+  $end = _eventweek_javascript_datestring_to_php($_POST['end']);
+  if (!$start) {
+    die ("alert('No start date.');");
+  }
+  if (!$end) {
+    die ("alert('No end date.');");
+  } 
+  if (!$title) {
+    $title = "[Untitled]";
+  }  
+  
+  // See what changed
+  // TODO: Move this to NodeAPI so it captures all possible edits
+  $change_summary = '';
+  if ($node->title != $title) {
+    $change_summary .= "Title was changed from \"" . $node->title . "\" to \"" . $title . "\"\n";  	
+  }
+  if ($node->body != $body) {
+    $change_summary .= "Description was changed.\n";    
+  }
+  if ($node->event['start'] != $start->format('Y-m-d H:i:s')) {
+    $change_summary .= "Start time was changed from " . $node->event['start'] . " to " . $start->format('Y-m-d H:i:s') . "\n";    
+  }
+  if ($node->event['end'] != $end->format('Y-m-d H:i:s')) {
+    $change_summary .= "End time was changed from " . $node->event['end'] . " to " . $end->format('Y-m-d H:i:s') . "\n";    
+  }
+ 
+  // make the changes
+  $node->title = $title;
+  $node->body = $body;
+  $node->teaser = $body;  
+  $node->event['start_exploded'] = event_explode_date($start->format('Y-m-d H:i:s')); // '2009-06-29 23:12:34'
+  $node->event['end_exploded'] = event_explode_date($end->format('Y-m-d H:i:s')); // '2009-06-29 23:12:34'
+  $node->revision = 1; // Yes, we want revisions
+  $node->log = $change_summary;
+  
+  // save changes
+  node_save($node);
+
+  // We return a json representation of the updated node.  
+  echo json_encode(_eventweek_prepare_node_for_json($node));
+  die;
+  
+}
+
+/**
+ * AJAX API Call to create an event. 
+ * It accepts POST data, these fields recognized:
+ * start - in serialized javascript date format (ick!)
+ * end - in serialized javascript date format (ick!)
+ * title - Title of event given by user
+ * body - Body of event given by user
+ * 
+ * It returns a json object of the resulting new 
+ * drupal node.
+ */
+function eventweek_create_event() {
+  global $user;
+    
+  // Insure has permissino to create node
+  // (Shouldn't drupal inforce this?)
+  if (!user_access('create event content')) {
+    die ('alert("User has no permission to create events.");');
+  }
+  
+  // Set up the node
+  $title = $_POST['title'];
+  $body = $_POST['body_raw'];
+  $start = _eventweek_javascript_datestring_to_php($_POST['start']);
+  $end = _eventweek_javascript_datestring_to_php($_POST['end']);
+  if (!$title) {
+    $title = "[Untitled]";
+  }
+  
+  //
+  // Create the node
+  // (Example code from: http://drupal.org/node/178506#comment-1590834)
+  // (Formerly, Example code from: http://drupal.org/node/178506#comment-895418)
+  //
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+  module_load_include('inc', 'node', 'node.pages');   
+  $node = new stdClass();
+  $node->type = 'event';
+  node_object_prepare($node);
+  $node->uid = $user->uid;
+  $node->title = $title;
+  $node->body = $body;
+  $node->teaser = $body;
+  $node->filter = 2; //variable_get('filter_default_format', 1); // For now we're hard-coding filter and format
+  $node->format = 2; //FILTER_FORMAT_DEFAULT;
+  $node->language = '';
+  $node->revision = 1; // Yes, we want revisions
+  $node->log = "Created by jquery calendar-week interface."; // TODO: Better log messages
+  $node->promote = 0; // No, we don't need it promoted to front page
+  $node->created = time();
+  $node->comment= 2; // Yes, we want read/write comments
+  
+  $node->event = array();
+  $node->event['start_exploded'] = event_explode_date($start->format('Y-m-d H:i:s')); // '2009-06-29 23:12:34'
+  $node->event['end_exploded'] = event_explode_date($end->format('Y-m-d H:i:s')); // '2009-06-29 23:12:34'
+  $node->event['timezone'] = variable_get('date_default_timezone_id', 0); // TODO: For now we're hardcoded to using the site's timezone.
+  $node->event['start_in_dst'] = 0; // TODO: Check for actual daylight savaings time
+  $node->event['end_in_dst'] = 0;
+  $node->event['has_time'] = 1;
+  $node->event['has_end_date'] = 1; 
+    
+  node_save($node);
+  $nid = $node->nid;
+
+  // We return a json representation of the newly created node.  
+  // We load it again to get all teh other data from the node.
+  $loaded_node = node_load($node->nid);
+  echo json_encode(_eventweek_prepare_node_for_json($loaded_node));
+  die;
+}
+
+/**
+ * AJAX API that returns JSON containing all events for the specified week
+ */
+function eventweek_fetch_events() {
+  
+  $types = NULL;
+  $terms = NULL;
+  $rewrite_parameter = array();
+  
+  // get weekdays array and header information
+  $weekdays = event_week_days();
+  // get current date value
+  $today = _event_user_date();
+
+  $middle_of_week_timestamp = (intval($_GET['start']) + intval($_GET['end'])) / 2;
+  $middle_of_week_datearray = date_parse(date('c',$middle_of_week_timestamp));
+  //print "/*Start:" . $_GET['start'] . " End:" . $_GET['end'] . " Middle:" . $middle_of_week_timestamp . "\n<hr>\nEvent module date:"  . print_r($middle_of_week_datearray, true) . "\n<hr>*/\n";
+  $date = $middle_of_week_datearray; // TODO: This is a hack...we base the requested week on the averate of the begin and end timestamps given by the calendar.
+  
+  if (!$_GET['start']) {
+    $date = _event_user_date();
+    print "/* No date range provided. Using today's date. */";
+  }
+  
+  // apply offset to goto first day of week
+  $cur_date = event_date_later($date, -1 * _event_day_of_week($date));
+  event_calendar_data($date, 'week', $types, $terms, 'prepopulate', array(), $rewrite_parameter);
+          
+  // Create the object (containing an 'events' array) which we will later return as json to the calendar          
+  $json_out = new StdClass();
+  $json_out->events = array();
+  
+  for ($x = 0; $x < 7; $x++) {
+    $output = '';
+    $nodes = event_calendar_data($cur_date, 'week', $types, $terms, 'lookup', array(), $rewrite_parameter);
+    if (count($nodes)) {
+      foreach ($nodes as $node) {
+        $readonly = 'true';        
+        // Check if user has permission to edit events
+        if (user_access('edit any event content')) {
+          $readonly=false;
+        }
+        if ($node->taxonomy[1]->name == "Locked") {
+          $readonly=true;          
+        }
+        
+        /*
+        print "<hr>";
+        print $node->taxonomy[1]->name . "<br>";
+        //print_r($node->taxonomy[1]);
+        print $readonly;
+        print "<hr>";
+        */
+        $node->readOnly = $readonly;
+        /*
+        $json_id = $node->nid;
+        $start_year = $node->event['start_exploded']['year'];
+        $start_month = $node->event['start_exploded']['month'] - 1; // jQuery calendar starts with January = 0, drupal with January = 1
+        $start_day = $node->event['start_exploded']['day'];
+        $start_hour = $node->event['start_exploded']['hour'];
+        $start_minute = $node->event['start_exploded']['minute'];
+        $start_second = $node->event['start_exploded']['second'];
+        $end_year = $node->event['end_exploded']['year'];
+        $end_month = $node->event['end_exploded']['month'] - 1; // jQuery calendar ends with January = 0, drupal with January = 1
+        $end_day = $node->event['end_exploded']['day'];
+        $end_hour = $node->event['end_exploded']['hour'];
+        $end_minute = $node->event['end_exploded']['minute'];
+        $end_second = $node->event['end_exploded']['second'];
+        $json_title = addslashes($node->title);
+        $json_body = addslashes($node->body);
+        $json_body = preg_replace('/[\n]/', '\n', $json_body); // escape carriage returns (javascript json handler chokes otherwise)
+        $json_body = preg_replace('/[\r]/', '', $json_body); // delete linfeeds (no idea why they are there)
+        */
+        //$json_body = rawurlencode($node->body);
+        $body_rendered =  rawurlencode(check_markup($node->body, $node->format, FALSE)); 
+        $json_out->events[] = (_eventweek_prepare_node_for_json($node));
+      }
+    }
+    else {
+      // day is empty
+      $output = ''; 
+    }
+    // advance to the next day of the week
+    $cur_date = event_date_later($cur_date, 1);
+  }
+  // return whole shebang as json
+  print json_encode($json_out);        
+  die;
+}
+
+/**
+ * Prepare a node to be exported as JSON object to the calendar AJAX.
+ */
+function _eventweek_prepare_node_for_json($node) {
+  if (!$node->picture) {
+    $node->picture = variable_get('user_picture_default', '');
+  }  
+  $node->start = event_format_date($node->event['start_site'], 'custom', 'Y-m-d\TH:i:s-01:00');
+  $node->end = event_format_date($node->event['end_site'], 'custom', 'Y-m-d\TH:i:s-01:00');
+  $node->id = $node->nid;
+  $node->body_raw = $node->body; // we keep a version of the un-formatted body (used when editing)
+  $node->body = check_markup($node->body, $node->format, FALSE); // we go ahead and add formatting to the body, so it displays correctly
+  return $node;
+}
+
+/**
+ * Utility funciton that converts a javascript datestring to a 
+ * PHP date object.
+ * Parse icky javascript date format for start and end dates
+ * (If you pass the javascript date as-is to date_create(), 
+ * it get's confused by the 'GMT' in the date string and messes up 
+ * the timezone)
+ * I.e. Sample javascript datestring of "Mon Jun 29 2009 15:00:23 GMT+0200 (CEST)"
+ * would be parsed as being in GMT timezone, ignoring the +0200 after it.
+ */
+function _eventweek_javascript_datestring_to_php($javascript_datestring) {
+  $regexp = '/^(...) (...) (\d+) (\d\d\d\d) (\d\d):(\d\d):(\d\d).*GMT(.\d+) /';
+  preg_match_all($regexp, $javascript_datestring, $arr, PREG_PATTERN_ORDER);
+  $php_datestring = $arr[2][0] . " "; // Month - Jun
+  $php_datestring.= $arr[3][0] . " "; // Day - 26
+  $php_datestring.= $arr[4][0] . " "; // Year - 2009
+  $php_datestring.= $arr[5][0] . ":"; // Hour - 12
+  $php_datestring.= $arr[6][0] . ":"; // Minute - 25
+  $php_datestring.= $arr[7][0] . " "; // Second - 49
+  $php_datestring.= $arr[8][0] . " "; // Timezone - +0200
+  $date = date_create($php_datestring);
+  return $date;
+}
+
+
+/**
+ * Display a page showing an interactive week view of calendar
+ * 
+ * Uses code from: http://jquery-week-calendar.googlecode.com/svn/trunk/jquery.weekcalendar/full_demo/weekcalendar_full_demo.html
+ * See also: http://www.redredred.com.au/projects/jquery-week-calendar/
+ */
+function eventweek_display($year, $month, $day) {
+  global $user;
+  
+  // SimStan Specific code:
+  $calendar_locked_until = variable_get("simstan_core_calendar_locked_until", time()+(60*60*24));
+  
+  // make calendar readonly if user doesn't have permissions
+  // the 'true' argument forces a recalculation of permissions
+  if (user_access('create event content', null, true)) {
+    $readonly = 'false';
+  }
+  else {
+    $readonly = 'true';
+  }
+
+  $cachebust = 'c';
+   
+  /*
+  // This was an attempt to do things the "Drupal" way, and have the
+  // calendar appear within context of a drupal page.  Couldn't get it to
+  // work, however. Might be problem with versions of jquery-ui.
+  // See: http://jquery-week-calendar.googlecode.com/svn/trunk/jquery.weekcalendar/full_demo/weekcalendar_full_demo.html
+  drupal_add_css(drupal_get_path('module', 'eventweek') .'/css/reset.css');
+  drupal_add_css('http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/start/jquery-ui.css');
+  drupal_add_css(drupal_get_path('module', 'eventweek') .'/css/jquery.weekcalendar.css');
+  drupal_add_css(drupal_get_path('module', 'eventweek') .'/css/demo.css');
+  //drupal_add_js('http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js');
+  //drupal_add_js('http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js');
+  jquery_ui_add(array());
+  
+  drupal_add_js(drupal_get_path('module', 'eventweek') .'/js/jquery.weekcalendar.js');
+  drupal_add_js(drupal_get_path('module', 'eventweek') .'/js/demo.js');
+  */
+  
+  $css_path = '/' . drupal_get_path('module', 'eventweek') . '/css';
+  $js_path = '/' . drupal_get_path('module', 'eventweek') . '/js';
+  
+  $out = <<<EOF
+<html>
+<head>
+
+  <link rel='stylesheet' type='text/css' href='$css_path/reset.css?$cachebust' />
+  <link rel='stylesheet' type='text/css' href='$css_path/wanderingstan-flat/jquery-ui-1.7.2.custom.css?$cachebust' />
+  <link rel='stylesheet' type='text/css' href='$css_path/jquery.weekcalendar.css?$cachebust' />
+  <link rel='stylesheet' type='text/css' href='$css_path/demo.css?$cachebust' />
+  
+  <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js?$cachebust'></script>
+  <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js?$cachebust'></script>
+
+  <script type='text/javascript'>
+    eventweekOptions = {
+      readonly : $readonly, /* User: {$user->uid} */
+      dateFormat: "j F",
+      timeFormat: "G:i",
+      buttonText : {
+        lastWeek : "&lt;",
+        nextWeek : "&gt;",
+        today : "Today",
+      },
+      calendarLockedUntilUnixTime : $calendar_locked_until,
+      userName : "{$user->name}",
+      userId : {$user->uid},
+      userPicUrl : "{$user->picture}",
+    };      
+  </script>
+  
+  <script type='text/javascript' src='$js_path/jquery.weekcalendar.js'></script>
+  <script type='text/javascript' src='$js_path/demo.js'></script>
+
+</head>
+<body> 
+
+  <!-- Warn users of old IE6 -->
+  <!--[if lte IE 6]><script src="$js_path/ie6/warning.js"></script><script>window.onload=function(){e("js/ie6/")}</script><![endif]-->
+
+  <div id='calendar'></div>
+  <div id="event_edit_container">
+    <form>
+      <input type="hidden" />
+      <ul>  
+        <li>
+          <span>Creator: </span><span class="edit-creator-holder"></span> 
+        </li>            
+        <li>
+          <span>Date: </span><span class="date_holder"></span> 
+        </li>
+        <li>
+          <label for="start">Start Time: </label><select name="start"><option value="">Select Start Time</option></select>
+        </li>
+        <li>
+          <label for="end">End Time: </label><select name="end"><option value="">Select End Time</option></select>
+        </li>
+        <li>
+          <label for="title">Title: </label><input type="text" name="title" />
+        </li>
+        <li>
+          <label for="body">Body: </label><textarea name="body"></textarea>
+        </li>
+        <div class="details_holder"></div> 
+      </ul>
+    </form>
+  </div>
+
+  <!-- dialog shown when just looking, not editing -->
+  <div id="event_view_container">
+    <ul>  
+      <li>
+        <span>Creator: </span><span class="view-creator-holder"></span> 
+      </li>   
+      <li>
+        <span>Date: </span><span class="date_holder"></span> 
+      </li>
+      <li>
+        Start Time: <span id="view-start-field"></span> to <span id="view-end-field"></span>
+      </li>
+      <li>
+        Title: <span id="view-title-field"></span>
+      </li>
+      <li>
+        Body: <span id="view-body-field"></span>
+      </li>
+      <div class="details_holder"></div> 
+    </ul>
+  </div>
+  
+</body>
+</html>
+ 
+EOF;
+  
+  print $out;
+  die;
+} 

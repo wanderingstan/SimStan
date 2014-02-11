@@ -1,0 +1,4 @@
+name = Event Week View
+description = An alternate display of weeks for the Event Module, inspired by Google Calendar. (Experimental)
+package = "Event"
+core = 6.x

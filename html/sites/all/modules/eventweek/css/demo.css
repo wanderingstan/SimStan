@@ -1,0 +1,222 @@
+body {
+	font-family: "Lucida Grande", Helvetica, Arial, Verdana, sans-serif;
+	font-size: 83.33%;
+}
+
+h1 {
+	padding: 0.5em;
+	font-size: 1.6em;
+} 
+
+h2 {
+	margin: 0.5em 0;
+	font-size: 1.4em;	
+}
+
+p {
+	margin: 0.5em;	
+}
+
+.ui-widget {
+	font-size: 1em;	
+}
+
+#event_edit_container, #event_view_container, #about {
+	display: none;
+}
+
+#about_button_container {
+	position: absolute;
+	top: 1em;
+	right: 1em;	
+	padding: 0.5em 2em;
+	background: #ddf;
+	border: 1px solid #bbd;
+	width: 10em;
+	text-align: center;
+}
+
+.week-calendar-header td {
+	background: url(images/header-bg.png) repeat-x;
+}
+
+label {
+	display: block;
+	margin-top: 1em;
+	margin-bottom: 0.5em;
+}
+
+form ul {
+	padding: 0.3em;
+}
+
+select, input[type='text'], textarea {
+	width: 250px;
+	padding: 3px;
+}
+
+input[type='text'] {
+	width: 245px;
+}
+
+ul.formatted,ol.formatted {
+	display: block;
+	margin: 1em 0.5em;
+}
+
+ul.formatted li,ol.formatted li {
+	margin: 5px 30px;
+	display: auto;
+}
+
+ul.formatted li {
+	list-style-type: disc;
+}
+
+ol.formatted li {
+	list-style-type: decimal;
+}
+
+
+.business-hours {
+  color: black;
+}
+
+.week-calendar .calendar-nav {
+  text-align: left;
+}
+/*
+
+
+.business-hours .am-pm {
+  font-size: 1.2em;
+}
+
+.hour-header {
+   font-size: 18px;
+   color: pink;
+}
+*/
+
+/* SimStan */
+.cal-user-picture-div {
+  float: left;
+  width: 32px;
+  height: 32px;
+}
+.cal-user-picture {
+  max-width: 32px;
+  max-height: 32px;
+}
+.cal-event .title {
+  text-align: left;
+  font-size: 13px;
+}
+
+.cal-event .title img {
+  width: 100%; 
+}
+
+#view-body-field img {
+  width: 100%;
+}
+
+.week-calendar {
+  font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+  font-size:13px;
+}
+
+.cal-event .time {
+  font-size:11px;
+  text-align:left;
+}
+
+// increase size of the bottom handle
+.ui-resizable-s {
+  bottom:-8px;
+  height:15px;
+}
+.ui-resizable-handle {
+  height:15px;
+}
+
+
+// Changing colors to match jquery theme
+/*
+.cal-event .time {
+  background-color: #0078AE;
+}
+
+.cal-event {
+  background-color: #72B9D7;
+}
+
+.grid-timeslot-header {
+  background-color: #fff;
+}
+
+.week-calendar-header td {
+  background: #72B9D7;
+}
+*/
+
+bob {
+  color: red;
+}
+
+// .ui-widget-header
+.week-calendar-header td {
+  background: #BB3300;
+}
+
+.cal-event .time {
+  background-color: #BB3300;
+  border: 1px solid #BB3300;
+}
+
+.cal-event {
+  background-color: #d88a6d;
+  border: 1px solid #BB3300;
+  
+}
+
+.week-calendar-header td {
+  color: #ffffff;
+  background-color: #BB3300;
+  font-size: 13px;
+}
+
+.calendar-nav .today, .calendar-nav .prev, .calendar-nav .next {
+  font-size: 24px;
+  line-height:1.4em;
+  padding:0.2em 0.6em 0.3em;  
+  font-size: 1em;
+}
+
+.week-calendar .calendar-nav button {
+  margin: 0 0em;
+}
+
+/* background hilite for today's column */
+.week-calendar-time-slots .today {
+  background-color: #F2E4DE;
+}
+
+td.grid-timeslot-header {
+  background:#F2E4DE none repeat scroll 0 0;
+  width:6%;
+}
+
+#event_edit_container input,  #event_edit_container textarea{
+  width: 100%;
+}
+
+#event_edit_container textarea {
+  height: 8em;
+}
+
+.details_holder {
+  margin-top: 1em;
+}
+
+

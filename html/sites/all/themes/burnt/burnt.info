@@ -1,0 +1,13 @@
+name = Burnt
+description = Simple fixed width 2 column
+core = 6.x
+engine = phptemplate
+screenshot = screenshot.png
+
+
+; Information added by drupal.org packaging script on 2008-02-14
+version = "6.x-1.6"
+core = "6.x"
+project = "burnt"
+datestamp = "1203022806"
+

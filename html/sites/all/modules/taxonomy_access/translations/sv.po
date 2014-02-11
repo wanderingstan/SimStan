@@ -1,0 +1,233 @@
+# $Id: sv.po,v 1.1.2.2 2008/08/12 14:19:02 seals Exp $
+#
+# Swedish translation of Drupal (taxonomy_access)
+# Copyright 2008 Magnus Gunnarsson <seals@passagen.se>
+# Generated from files:
+#  taxonomy_access_admin.inc,v 1.15.2.3 2008/07/29 17:47:58 cpugeniusmv
+#  taxonomy_access.module,v 1.107.2.2 2008/08/05 14:29:31 cpugeniusmv
+#  taxonomy_access.install,v 1.9 2008/02/22 20:50:27 keve
+#  taxonomy_access.info,v 1.5 2008/02/23 20:45:19 keve
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Taxonomy Access Control 6.x\n"
+"POT-Creation-Date: 2008-08-12 14:59+0200\n"
+"PO-Revision-Date: 2008-08-12 15:13+0100\n"
+"Last-Translator: Magnus Gunnarsson <seals@passagen.se>\n"
+"Language-Team: drupalsverige.se\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Poedit-Language: Swedish\n"
+"X-Poedit-Country: SWEDEN\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: taxonomy_access_admin.inc:47
+msgid "Role"
+msgstr "Roll"
+
+#: taxonomy_access_admin.inc:60
+msgid "disable"
+msgstr "Avaktivera"
+
+#: taxonomy_access_admin.inc:62
+msgid "edit"
+msgstr "redigera"
+
+#: taxonomy_access_admin.inc:65
+msgid "enable"
+msgstr "aktivera"
+
+#: taxonomy_access_admin.inc:88
+msgid "Are you sure you want to delete all grant rules for role %rid?"
+msgstr "Är du säker på att du vill radera alla beviljade rättigheter för rollen %rid?"
+
+#: taxonomy_access_admin.inc:89
+msgid "This action cannot be undone."
+msgstr "Denna åtgärd kan inte ångras."
+
+#: taxonomy_access_admin.inc:90
+msgid "Delete all"
+msgstr "Radera allt"
+
+#: taxonomy_access_admin.inc:90
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: taxonomy_access_admin.inc:142;152
+msgid "<em>default</em>"
+msgstr "<em>standard</em>"
+
+#: taxonomy_access_admin.inc:143
+msgid "can't be disabled without disabling TAC for this role"
+msgstr "kan inte inaktiveras utan att TAC inaktiveras för denna roll"
+
+#: taxonomy_access_admin.inc:156
+msgid "*default*"
+msgstr "*standard*"
+
+#: taxonomy_access_admin.inc:184;312
+msgid "Add"
+msgstr "Lägg till"
+
+#: taxonomy_access_admin.inc:190;286
+msgid "Delete selected"
+msgstr "Radera markerade"
+
+#: taxonomy_access_admin.inc:195;324
+msgid "Save all"
+msgstr "Spara alla"
+
+#: taxonomy_access_admin.inc:207
+msgid "Category"
+msgstr "Kategori"
+
+#: taxonomy_access_admin.inc:208
+msgid "View"
+msgstr "Visa"
+
+#: taxonomy_access_admin.inc:209
+msgid "Update"
+msgstr "Uppdatera"
+
+#: taxonomy_access_admin.inc:210
+msgid "Delete"
+msgstr "Radera"
+
+#: taxonomy_access_admin.inc:211
+msgid "Create"
+msgstr "Skapa"
+
+#: taxonomy_access_admin.inc:212
+msgid "List"
+msgstr "Visa"
+
+#: taxonomy_access_admin.inc:215
+msgid "A"
+msgstr "A"
+
+#: taxonomy_access_admin.inc:216
+msgid "I"
+msgstr "I"
+
+#: taxonomy_access_admin.inc:217
+msgid "D"
+msgstr "D"
+
+#: taxonomy_access_admin.inc:224
+msgid "Allow"
+msgstr "Tillåt"
+
+#: taxonomy_access_admin.inc:224
+msgid "Ignore"
+msgstr "Ignorera"
+
+#: taxonomy_access_admin.inc:224
+msgid "Deny"
+msgstr "Neka"
+
+#: taxonomy_access_admin.inc:226
+msgid "Grants for %role"
+msgstr "Beviljanden för %role"
+
+#: taxonomy_access.module:17
+msgid "The Taxonomy Access Control module allows users to specify how each category can be used by various roles."
+msgstr "Modulen Taxonomy Access Controll (Behörighet för taxonomier)  låter användarna specificera hur varje kategori kan användas av olika roller."
+
+#: taxonomy_access.module:18
+msgid "Permissions can be set differently to each USER ROLES. Be aware that setting Taxonony Access permissions works ONLY WITHIN ONE USER ROLE. <br /><em>(For users with multiple user roles, see section \"GOOD TO KNOW\" below.)</em>"
+msgstr "Rättigheter kan fastställas olika för varje ROLL. Märk väl att rättigheter för åtkomst till taxonomier fungerar <strong>endast inom en roll</strong>.<br><em>(För användare med flera roller, se delen \"BRA ATT VETA\" längre ned.)</em>"
+
+#: taxonomy_access.module:19
+msgid "On the category permissions page for each role, each category displays a list of the terms within it, each with five types of permission: <em>View, Update, Delete, Create</em> and <em>List</em>:"
+msgstr "På sidan rättigheter för kategorier åt varje roll visar varje kategori en lista av termer inom kategorin, varje med fem olika typer av rättigheter: <em>Visa, Radera, Uppdatera, Skapa</em> och <em>Lista</em>."
+
+#: taxonomy_access.module:21
+msgid "<strong>VIEW</strong> enables the user to access content (nodes) with given term."
+msgstr "<strong>VISA</strong> möjliggör för användare att komma åt innehåll (noder) inom given term."
+
+#: taxonomy_access.module:22
+msgid "<strong>UPDATE, DELETE</strong> enables the user to Update/Delete <u>ALL</u> nodes with the given term. <br><em>(These two permissions are <u>administrator permissions</u>, that should be given ONLY to e.g. content administrators.)</em>"
+msgstr "<strong>UPPDATERA, RADERA</strong> möjliggör för användare att uppdatera/radera <u>ALLA</u> noder inom given term.<br><em>(Dessa två rättigheter är <u>administrera rättigheter</u>, som BARA bör ges till exempelvis administratörer för innehåll.)</em>"
+
+#: taxonomy_access.module:23
+msgid "<strong>CREATE</strong> enables the user to set that term when adding a new node or when editing a node."
+msgstr "<strong>SKAPA</strong> möjliggör för användare att sätta den termen när en ny nod skapas eller redigeras."
+
+#: taxonomy_access.module:24
+msgid "<strong>LIST</strong> enables the user to view the name of the given term below the title of a node or in category lists.  It also controls whether a user can access the taxonomy page for the given term.  (e.g. \"taxonomy/term/*\")"
+msgstr "<strong>LISTA</strong> möjliggör för användare att visa namnet på den givna termen nedanför titeln på en nod i kategorilistan. Det kontrollerar också huruvida en användare har åtkomst till sidan för taxonomier för den givna termen. (Till exempel \"taxonomy/term/*\")"
+
+#: taxonomy_access.module:26
+msgid "VIEW, UPDATE, and DELETE control the node access system.  LIST and CREATE control if a user can view and select a given term.  (Note: In previous versions of Taxonomy Access Control, there was no LIST permission; its functionality was controlled by the VIEW permission.)"
+msgstr "VISA, UPPDATERA och RADERA kontrollerar systemet för åtkomst till noder. LISTA och SKAPA kontrollerar om en användare kan visa och välja en given term. (Notera: I föregående version av Taxonomy Access Controll (Behörighet för taxonomier) fanns det ingen rättighet för LISTNING. Dess funktion kontrollerades av rättigheten för VISNING.)"
+
+#: taxonomy_access.module:27
+msgid "<strong>VIEW, UPDATE and DELETE have three options for each term: <u>A</u>llow, <u>I</u>gnore, and <u>D</u>eny.</strong>  Indicate which rights each role should have for each term."
+msgstr "<strong>VISA, UPPDATERA och RADERA har tre alternativ för varje term: <u>T</u>illåt, <u>I</u>gnorera och <u>N</u>eka.</strong> Indikerar vilka rättigheter varje roll skall ha för varje term."
+
+#: taxonomy_access.module:28
+msgid "<strong>CREATE and LIST have only two options for each term:  YES (selected) or NO (deselected).</strong>  Indicate what each role should be allowed to do with each term."
+msgstr "<strong>SKAPA och LISTA har bara två alternativ för varje term: JA (valt) eller NEJ (ej valt).</strong> Indikerar vad varje roll kan tillåtas göra med varje term."
+
+#: taxonomy_access.module:29
+msgid "<strong>IMPORTANT NOTE:</strong><br><u>The DENY directives are processed after the ALLOW directives. (DENY overrides ALLOW.)</u>  So, if a multicategory node is in Categories \"A\" and \"B\" and a user has ALLOW permissions for VIEW in Category \"A\" and DENY permissions for VIEW in Category \"B\", then the user will NOT be permitted to VIEW the node. (DENY overrides ALLOW.)<br><u>Access is denied by default.</u> So, if a multicategory node is in Categories \"C\" and \"D\" and a user has IGNORE permissions for VIEW in both Category \"C\" and \"D\", then the user will NOT be permitted to VIEW the node.<br>(If you are familiar with Apache mod_access, this permission system works similar to directive: <em>ORDER ALLOW, DENY</em>)"
+msgstr "<strong>VIKTIG NOTERING:</strong><br><u>Direktivet NEKA körs efter TILLÅT. (NEKA åsidosätter TILLÅT.)</u> Så, om en nod med flera kategorier finns i Kategori \"A\" och \"B\" och en användare har rättigheterna TILLÅT för VISNING i Kategori \"A\" och rättigheterna NEKA för VISNING i Kategori \"B\", så kommer inte användaren att ges tillstånd att VISA noden. (NEKA åsidosätter TILLÅT.)<br><u>Som standard är tillgång satt till nekad.</u> Så, om en nod med flera kategorier finns i Kategori \"C\" och \"D\" och en användare har rättigheterna IGNORERA för VISNING i både Kategori \"C\" och  \"D\", så kommer INTE användaren att ges tillstånd att VISA noden.<br>(Om du är bekant med Apache mod_access så fungerar rättigheterna för det här systemet på liknande direktiv: <em>ORDER ALLOW, DENY</em>"
+
+#: taxonomy_access.module:30
+msgid "<strong>Allow/Ignore/Deny All</strong> or <strong>Select/Deselect All:</strong><br>Beside each vocabulary title there are dropdowns containing the options that can be set for individual terms.  Selecting one of these options using the dropdown effectively <u>selects that option for ALL of the individual terms inside that vocabulary when the options are saved.</u><br>Selecting \"--\" does not make any automatic changes to the permission of the terms in that vocabulary; only manual changes that you make will be saved.<br>NOTE:  This does <u>not</u> change the \"Default\" option (described below)."
+msgstr "<strong>Tillåt/Ignorera/Neka alla</strong eller <strong>Markera/Avmarkera alla:</strong><br>Bredvid varje vokabulärs titel finns det en rullgardinsmeny som innehåller alternativen som kan sättas för varje individuell term. Genom att välja ett av dessa alternativ i rullgardinsmenyn </u>väljs i själva verket det alternativet för ALLA av de individuella termerna inuti ett vokabulär när alternativen sparas.</u><br>Att välja \"--\" ger inga automatiska ändringar för rättigheterna till termerna inom det vokabuläret. Endast manuella ändringar som du har gjort kommer att sparas.<br>NOTERA: Detta ändrar <u>inte</u> det \"Förvalda\" alternativet (beskrivet nedan)."
+
+#: taxonomy_access.module:31
+msgid "<strong>Default:</strong><br>This option, just underneath the vocabulary title, <u>sets the permission that will automatically be given</u> to the role, <u>for any new terms</u> that are added within the vocabulary.  This includes terms that are added via free tagging."
+msgstr "<strong>Förvalt:</strong><br> Detta alternativ, precis nedanför titeln för vokabuläret, <u>sätter rättigheten som automatiskt skall ges</u> till en roll för <u>vilken ny term som helst</u> som har lagts till inom vokabuläret. Detta inkluderar termer som har lagts till via fri märkning."
+
+#: taxonomy_access.module:32
+msgid "GOOD TO KNOW:"
+msgstr "BRA ATT VETA:"
+
+#: taxonomy_access.module:33
+msgid "<strong>Users with multiple user roles:</strong> Allow/Ignore/Deny options are interpreted <u>only within one user role</u>. When a user belongs to multiple user roles, then <u>user gets access if ANY of his user roles</u> has the access granted. <br />In this case, permissions for the given user are calculated, so that the <u>permissions of ALL of his user roles are \"OR-ed\" together</u>. Meaning that Allow will take precedence over Deny. This is different from how node access permissions (for multi-category nodes) are handled within ONE USER ROLE, as noted above."
+msgstr "<strong>Användare med flera roller:</strong> Alternativen Tillåt/Ignorera/Neka tolkas <u>bara inom en roll</u>. När en användare tillhör flera roller så <u>får användare behörighet om NÅGON av hans roller</u> har givits behörighet.<br> I detta fall räknas rättigheterna ut för den givna användaren så att <u>rättigheterna för ALLA hans roller är sammanfogade \"Antingen/Eller\" (OR) tillsammans</u>. Med detta menas att Tillåt har företräde för Neka. Detta är skillnaden mot hur rättigheterna för nodbehörigheterna (för multipa nodkategorier) hanteras inom EN ROLL som det nämndes ovan."
+
+#: taxonomy_access.module:34
+msgid "<br><strong>Input formats:</strong>  <u>Node editing/deleting is blocked</u>, even when user has <em>UPDATE/DELETE</em> permission to the node, <u>when user is not allowed to use a filter format</u> that the node was saved at."
+msgstr "<br><strong>Inmatningsformat:</strong <u>Redigera/radera noder är spärrat</u>, även om användaren har rättigheten <em>UPPDATERA/RADERA</em> för noden, <u>när användare inte är tillåten att använda ett filtreringsformat</u> som noden sparades som."
+
+#: taxonomy_access.module:152
+msgid "Taxonomy access permissions"
+msgstr "Taxonomibehörigheter"
+
+#: taxonomy_access.module:153
+msgid "Taxonomy-based access control for content"
+msgstr "Taxonomibaserad behörighet för innehåll"
+
+#: taxonomy_access.module:0
+msgid "taxonomy_access"
+msgstr "taxonomy_access"
+
+#: taxonomy_access.install:19;38
+msgid "Taxonomy Access - Update #2: No queries executed. Field 'grant_list' already exists in tables 'term_access'."
+msgstr "Tillgång till taxonomier - Uppdatering #2: Inga förfrågningar utförda. Fältet \"grant_list\" finns redan i tabellen \"Term_access\"."
+
+#: taxonomy_access.install:171
+msgid "Taxonomy Access module installed tables successfully."
+msgstr "Taxonomy Access Controll (Behörighet för taxonomier)  installerade tabeller utan problem."
+
+#: taxonomy_access.install:174
+msgid "The installation of Taxonomy Access module was unsuccessful."
+msgstr "Installationen av Taxonomy Access Controll (Behörighet för taxonomier)  misslyckades."
+
+#: taxonomy_access.install:182
+msgid "Taxonomy Access have been successfully uninstalled."
+msgstr "Taxonomy Access Controll (Behörighet för taxonomier)  har avinstallerats utan problem."
+
+#: taxonomy_access.info:0
+msgid "Taxonomy Access Control"
+msgstr "Taxonomy Access Controll (Behörighet för taxonomier) "
+
+#: taxonomy_access.info:0
+msgid "Access control for user roles based on taxonomy categories."
+msgstr "Behörighet för roller baserat på kategorier av typen taxonomier."
+
