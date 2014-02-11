@@ -3,12 +3,12 @@ SimStan
 
 ![Screenshot of SimStan](simstan_screenshot_1.png "Screenshot")
 
-A project by Stan James.
+A project by Stan James. Full story is below, or found at: http://wanderingstan.com/2009-12-01/simstan-the-story-of-a-summer-project
 
 
 Technical Details
 -----------------
-MySQL database is in file simstan.sql
+Based on Drupal 6. PHP+MySQL.  MySQL database is in file simstan.sql
 
 Directory 'html' contains all files that should be put on your webserver. It is a basic Drupal 6 installation with several custom modules.
 
@@ -28,8 +28,6 @@ For all it’s faults, Drupal is still a fast way to prototype. SimStan is based
 
 Background Story
 ----------------
-
-Full blog post: http://wanderingstan.com/2009-12-01/simstan-the-story-of-a-summer-project
 
 This summer in Berlin I took a vacation from making choices, and let my friends run my life.
 
